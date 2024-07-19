@@ -1,28 +1,34 @@
-from fbchat.models import *
+module.exports = {
+  config: {
+    name: "autorespondv2",
+    version: "2.0.0",
+    author: "Haru",
+    cooldown: 5,
+    role: 0,
+    shortDescription: "Autoresponds with reactions and replies",
+    longDescription: "Autoresponds with reactions and replies based on specific words or triggers.",
+    category: "fun",
+    guide: "?autorespondv3"
+  },
+  onStart: async ({ api, event }) => {
+    // Blank onStart function as per the request
+  },
+  onChat: async ({ api, event, message }) => {
+    const { body, messageID, threadID } = event;
 
-def command(input_value, thread_id=None, thread_type=None, author_id=None, thread_prefix=None, thread_global=None, thread_user=None, thread_messageid=None, message_object=None, mid=None, bot=None):
-    import requests
-    import json
-    config = {
-        "name": "sim",
-        "version": "1.0.1",
-        "description": "Talk to sim. (PH)",
-        "credits": "Kenlie Jugarap",
-        "usages": "<ask anything>",
-        "cooldown": "2"
+    // Reactions based on words
+    const emojis = {
+      "😢": [ ":(", "lungkot", "sad", ":<", "suicide", "su1cide", "depressed", "depression", "sad emoji" ]
+    };
+
+    // React based on words
+    for (const [emoji, words] of Object.entries(emojis)) {
+      for (const word of words) {
+        if (body.toLowerCase().includes(word)) {
+          api.setMessageReaction(emoji, messageID, () => {}, true);
+            message.reply("Cheer up po! Don't be sad na, I'm always here to support you. Kung hindi mo na kaya, chat mo lang nanay ko. Magaling yun mag comfort <3");
+        }
+      }
     }
-    if input_value == "__config__":
-        return config
-    elif input_value.startswith(config['name']):
-        try:
-            talk = input_value[len(config['name']):].strip()
-            if talk != '':
-                talk2 = requests.get('https://simsimi.fun/api/v2/?mode=talk&lang=ph&message={}&filter=true'.format(talk))
-                decoded_response = json.loads(talk2.content.decode('utf-8-sig'))
-                bot.sendmessage(author_id, thread_id, thread_type, str(decoded_response['success']))
-            else:
-                bot.sendmessage(author_id, thread_id, thread_type, f"❌𝚆𝚁𝙾𝙽𝙶 𝙵𝙾𝚁𝙼𝙰𝚃!\n{thread_prefix}{config['name']} <your question>")
-        except Exception as e:
-            bot.sendmessage(author_id, thread_id, thread_type, "❌Error fetching response.")
-    else:
-        bot.sendmessage(author_id, thread_id, thread_type, f"Default option in {config['name']}: {config['description']}")
+  }
+};
